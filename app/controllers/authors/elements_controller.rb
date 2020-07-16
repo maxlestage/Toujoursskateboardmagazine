@@ -1,33 +1,16 @@
 module Authors
   class ElementsController < AuthorsController
-    before_action :set_element, only: [:show, :edit, :update, :destroy]
-
-    # GET /elements
-    def index
-      @elements = Element.all
-    end
-
-    # GET /elements/1
-    def show
-    end
-
-    # GET /elements/new
-    def new
-      @element = Element.new
-    end
-
-    # GET /elements/1/edit
-    def edit
-    end
+    before_action :set_post
+    before_action :set_element, only: [:update, :destroy]
 
     # POST /elements
     def create
-      @element = Element.new(element_params)
+      @element = @post.elements.build
 
       if @element.save
-        redirect_to @element, notice: 'Element was successfully created.'
+        redirect_to @post
       else
-        render :new
+          redirect_to @post, notice: @element.errors.full_messages.join(". ") << "."
       end
     end
 
@@ -48,13 +31,17 @@ module Authors
 
     private
       # Use callbacks to share common setup or constraints between actions.
+      def set_post
+        @post = current_author.post.find(params[:post_id])
+      end
+
       def set_element
-        @element = Element.find(params[:id])
+        @element = @post.elements.find(params[:id])
       end
 
       # Only allow a trusted parameter "white list" through.
       def element_params
-        params.require(:element).permit(:element_type, :content, :post_id, :position)
+        params.require(:element).permit(:element_type, :content)
       end
   end
 end
