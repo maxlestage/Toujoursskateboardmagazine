@@ -5,22 +5,20 @@ module Authors
 
     # POST /elements
     def create
-      @element = @post.elements.build
+      @element = @post.elements.build(element_params)
 
       if @element.save
-        redirect_to @post
+        notice = nil
       else
-          redirect_to @post, notice: @element.errors.full_messages.join(". ") << "."
+        notice = @element.errors.full_messages.join(". ") << "."
       end
+        redirect_to edit_post_path(@post), notice: notice
     end
 
     # PATCH/PUT /elements/1
     def update
-      if @element.update(element_params)
-        redirect_to @element, notice: 'Element was successfully updated.'
-      else
-        render :edit
-      end
+      @element.update(element_params)
+      redirect_to edit_post_path(@element.post)
     end
 
     # DELETE /elements/1
@@ -32,7 +30,7 @@ module Authors
     private
       # Use callbacks to share common setup or constraints between actions.
       def set_post
-        @post = current_author.post.find(params[:post_id])
+        @post = current_author.posts.find(params[:post_id])
       end
 
       def set_element
